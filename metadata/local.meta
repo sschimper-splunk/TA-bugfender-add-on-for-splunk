@@ -1,0 +1,93 @@
+[props/bugfender%3Aapp%3Alogs]
+owner = admin
+version = 9.0.4.1
+modtime = 1680702317.045730000
+
+[props/source%3A%3A...ta-bugfender-add-on-for-splunk%2A.log%2A]
+owner = admin
+version = 9.0.4.1
+modtime = 1680702317.304754000
+
+[props/source%3A%3A...ta_bugfender_add_on_for_splunk%2A.log%2A]
+owner = admin
+version = 9.0.4.1
+modtime = 1680702317.505097000
+
+[props/bugfender%3Aapp%3Aissues]
+owner = admin
+version = 9.0.4.1
+modtime = 1680702446.460716000
+
+[inputs/bugfender_app_logs%3A%2F%2Ftest_frontdoor]
+owner = admin
+version = 9.0.4.1
+modtime = 1680705788.017721000
+
+[props/bugfender%3Aapp%3Alist]
+owner = admin
+version = 9.0.4.1
+modtime = 1680766719.840381000
+
+[props/bugfender%3Aapp%3Adevices]
+owner = admin
+version = 9.0.4.1
+modtime = 1680767006.761393000
+
+[indexes/test_list]
+owner = admin
+version = 9.0.4.1
+modtime = 1680771735.357554000
+
+[indexes/test_issues]
+owner = admin
+version = 9.0.4.1
+modtime = 1680858662.160084000
+
+[indexes/test_logs]
+owner = admin
+version = 9.0.4.1
+modtime = 1681713032.051689000
+
+[ta_bugfender_add_on_for_splunk_settings/logging]
+version = 9.0.4.1
+modtime = 1681904990.017801000
+
+[collections/TA_bugfender_add_on_for_splunk_checkpointer]
+owner = splunk-system-user
+version = 9.0.4.1
+modtime = 1681906442.927038000
+
+[passwords/credential%3A__REST_CREDENTIAL__%23TA-bugfender-add-on-for-splunk%23configs%2Fconf-ta_bugfender_add_on_for_splunk_account%3Afd%60%60splunk_cred_sep%60%601%3A]
+owner = admin
+version = 9.0.4.1
+modtime = 1681905012.849232000
+
+[passwords/credential%3A__REST_CREDENTIAL__%23TA-bugfender-add-on-for-splunk%23configs%2Fconf-ta_bugfender_add_on_for_splunk_account%3Afd%60%60splunk_cred_sep%60%602%3A]
+owner = admin
+version = 9.0.4.1
+modtime = 1681905012.989939000
+
+[ta_bugfender_add_on_for_splunk_account/fd]
+owner = admin
+version = 9.0.4.1
+modtime = 1681905013.122318000
+
+[inputs/bugfender_app_list%3A%2F%2Ftest_list]
+owner = admin
+version = 9.0.4.1
+modtime = 1681905458.338042000
+
+[inputs/bugfender_app_logs%3A%2F%2Ftest_logs]
+owner = admin
+version = 9.0.4.1
+modtime = 1681905459.105988000
+
+[inputs/bugfender_app_devices%3A%2F%2Ftest_devices]
+owner = admin
+version = 9.0.4.1
+modtime = 1681905456.701426000
+
+[inputs/bugfender_app_issues%3A%2F%2Ftest_issues]
+owner = admin
+version = 9.0.4.1
+modtime = 1682000313.203031000

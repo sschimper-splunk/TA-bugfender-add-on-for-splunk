@@ -1,0 +1,27 @@
+[app/install/install_source_checksum]
+version = 9.1.0
+modtime = 1689676236.995168000
+
+[ta_bugfender_add_on_for_splunk_settings/logging]
+version = 9.1.0
+modtime = 1689676470.912618000
+
+[passwords/credential%3A__REST_CREDENTIAL__%23TA-bugfender-add-on-for-splunk%23configs%2Fconf-ta_bugfender_add_on_for_splunk_account%3AFrontdoor%60%60splunk_cred_sep%60%601%3A]
+owner = admin
+version = 9.1.0
+modtime = 1689676513.504345000
+
+[passwords/credential%3A__REST_CREDENTIAL__%23TA-bugfender-add-on-for-splunk%23configs%2Fconf-ta_bugfender_add_on_for_splunk_account%3AFrontdoor%60%60splunk_cred_sep%60%602%3A]
+owner = admin
+version = 9.1.0
+modtime = 1689676513.518467000
+
+[ta_bugfender_add_on_for_splunk_account/Frontdoor]
+owner = admin
+version = 9.1.0
+modtime = 1689676513.533382000
+
+[inputs/bugfender_app_devices%3A%2F%2Fdevices_prod]
+owner = admin
+version = 9.1.0
+modtime = 1689742272.807025000

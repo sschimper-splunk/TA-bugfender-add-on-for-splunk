@@ -244,7 +244,6 @@ def get_bugfender_devices_endpoint_data(url, headers, params, helper):
     # set page size
     if (helper.get_arg("page_size")):
         params["page_size"] = helper.get_arg("page_size")
-    # DEBUG
     else:
         params["page_size"] = "100" # default value
 
@@ -257,7 +256,7 @@ def get_bugfender_devices_endpoint_data(url, headers, params, helper):
 
     next_cursor = "start" # intial value to enter while loop below
 
-    while next_cursor != "":
+    while (next_cursor != ""):
         if (next_cursor != "start"):
             params["next_cursor"] = next_cursor
 
@@ -268,7 +267,8 @@ def get_bugfender_devices_endpoint_data(url, headers, params, helper):
             headers = update_header_with_new_auth_token(helper)
             query_start_time = time.time()
         
-        # DEBUG
+        # Sleeping for 2 seconds to prevent the following error from occuring:
+        # "requests.exceptions.HTTPError: 429 Client Error: Too Many Requests for url: https://dashboard.bugfender.com/api/app/30525/devices[...]"
         time.sleep(2)
 
         response = make_api_call(url, headers, params, helper, "/devices", stream=False)

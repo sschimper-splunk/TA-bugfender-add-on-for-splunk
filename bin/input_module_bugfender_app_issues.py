@@ -52,7 +52,7 @@ def collect_events(helper, ew):
         timestamp_utc_seconds = bf.convert_rfc3339_to_utc_total_seconds(timestamp_rfc3339, helper)
 
         # update most recent timestamp and event
-        if(timestamp_utc >= most_recent_event_timestamp):
+        if (timestamp_utc >= most_recent_event_timestamp):
             most_recent_event_timestamp = timestamp_utc
             most_recent_event = issue
 

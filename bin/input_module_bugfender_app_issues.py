@@ -35,14 +35,7 @@ def collect_events(helper, ew):
 
     event_count = 0
     last_timestamp = bf.get_latest_timestamp(helper)
-    helper.log_debug(f"[-] last timestamp: {last_timestamp}")
-
-    # Retrieve latest saved timestamp, if it is None, use date far in the past
-    if last_timestamp is not None:
-        most_recent_event_timestamp = datetime.datetime.strptime(last_timestamp, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=pytz.utc)
-    else:
-        most_recent_event_timestamp = datetime.datetime(1970, 1, 1, tzinfo=pytz.utc)
-    most_recent_event = None
+    last_timestamp = bf.convert_latest_timestamp_to_string(last_timestamp, helper)
 
     # for each issue...
     for issue in issues_list:

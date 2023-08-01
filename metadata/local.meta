@@ -24,14 +24,24 @@ modtime = 1689676513.533382000
 [inputs/bugfender_app_devices%3A%2F%2Fdevices_prod]
 owner = admin
 version = 9.1.0
-modtime = 1689860364.618839000
-
-[inputs/bugfender_app_logs%3A%2F%2Flogs_test]
-owner = admin
-version = 9.1.0
-modtime = 1689861499.582853000
+modtime = 1690356526.774581000
 
 [collections/TA_bugfender_add_on_for_splunk_checkpointer]
 owner = splunk-system-user
 version = 9.1.0
 modtime = 1689855466.550988000
+
+[inputs/bugfender_app_logs%3A%2F%2Flogs_paginated]
+owner = admin
+version = 9.1.0
+modtime = 1690891713.660594000
+
+[indexes/bugfender]
+owner = admin
+version = 9.1.0
+modtime = 1690204597.981721000
+
+[inputs/bugfender_app_issues%3A%2F%2Fissues_prod]
+owner = admin
+version = 9.1.0
+modtime = 1690356525.192727000

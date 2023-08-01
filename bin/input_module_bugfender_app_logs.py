@@ -42,16 +42,19 @@ def collect_events(helper, ew):
     # get response from Bugfender API
     api_endpoint = "/logs/paginated"
     helper.log_debug(f"Starting to query data from enpoint {api_endpoint} to Splunk.")
-    response = bf.get_bugfender_data(helper, api_endpoint)
-    data = response.json()
+    # response = bf.get_bugfender_data(helper, api_endpoint)
+    # data = response.json()
+
+    # debug
+    log_list = bf.get_bugfender_data(helper, api_endpoint)
     
-    helper.log_debug(f"Data received. Starting to write data queried from enpoint {api_endpoint} to Splunk.")
+    helper.log_debug(f"Data received: {log_list} Starting to write data queried from enpoint {api_endpoint} to Splunk.")
 
     # initialize counters
     event_count = 0
 
     # for each response item ....
-    for item in data.get("data"):
+    for item in log_list:
         # convert Bugfender event timestamp from rfc3339 to utc
         timestamp_rfc3339 = item.get("time")
         timestamp_utc = bf.convert_rfc3339_to_utc(timestamp_rfc3339, helper)

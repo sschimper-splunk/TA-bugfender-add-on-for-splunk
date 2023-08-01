@@ -108,9 +108,26 @@ def get_bugfender_auth_token(account, helper):
 
     return response.json().get("access_token")
 
-def update_header_with_new_auth_token(helper):
-    auth_token = get_bugfender_auth_token(helper.get_arg("global_account"), helper)
-    return {"Authorization": f"Bearer {auth_token}"}
+def update_header_with_new_auth_token(time_tracking_auth_token, headers, helper):
+    helper.log_debug("[>] update_header_with_new_auth_token()")
+    if (time.time() - time_tracking_auth_token > 2700):
+        helper.log_debug("[>] update_header_with_new_auth_token() - 45 Minutes have passed, acquiring new access token.")
+        auth_token = get_bugfender_auth_token(helper.get_arg("global_account"), helper)
+        headers = {"Authorization": f"Bearer {auth_token}"}
+        time_tracking_auth_token = time.time()
+    return (headers, time_tracking_auth_token)
+
+def wait_if_api_limit_exceeded(time_tracking_api_calls, api_call_count, helper):
+    time_passed_seconds = time.time() - time_tracking_api_calls
+    helper.log_debug(f"[>] wait_if_api_limit_exceeded() - time_passed_seconds: {time_passed_seconds}, api_call_count: {api_call_count}")
+    if(time_passed_seconds <= 120 and api_call_count >= 100):
+    # if(time_passed_seconds <= 23):
+        time_to_wait = 120 - time_passed_seconds
+        helper.log_debug(f"[>] wait_if_api_limit_exceeded() - Waiting {time_to_wait} seconds...")
+        time.sleep(time_to_wait)
+        time_tracking_api_calls = time.time()
+        api_call_count = 0
+    return (time_tracking_api_calls, api_call_count)
 
  # perform API call
 def make_api_call(url, headers, params, helper, endpoint, stream):
@@ -119,13 +136,20 @@ def make_api_call(url, headers, params, helper, endpoint, stream):
     try:
         # response = requests.get(url, headers=headers, params=params, stream=stream)
         response = requests.get(url, headers=headers, params=params)
+        # response.raise_for_status() #DEBUG!!!!
+        if (response.status_code == 429):
+            helper.log_error("[>] make_api_call() - sleeping for 60 seconds and then trying again...")
+            time.sleep(60)
+            return make_api_call(url, headers, params, helper, endpoint, stream)
         response.raise_for_status()
     except Exception as e:
-        helper.log_error(f"GET Request to {url} failed: {str(e)}")
+        helper.log_error(f"[>] make_api_call() - GET Request to failed: {str(e)}")
+        helper.log_error(f"[>] make_api_call() - exception {type(e)}")
+        
         raise e
     helper.log_debug(f"Data successfully retrieved from Bugfender API Endpoint {endpoint}.")
 
-    return response
+    return response.json()
 
 # convert ndjson to json. Code taken from here: https://stackoverflow.com/questions/54191861/how-to-specify-requests-to-return-data-as-json
 def ndjson_to_json(ndjson, helper):
@@ -136,35 +160,45 @@ def ndjson_to_json(ndjson, helper):
     return result
 
 def get_bugfender_log_data(url, headers, params, helper, endpoint):
+    # DEBUG
+    params["date_range_start"] = "2023-07-20T00:00:00Z" ## DEBUG
+
     helper.log_debug("[>] get_bugfender_log_data()")
+    helper.log_debug(f"[>] get_bugfender_log_data() - URL: {url}, params: {params}")
     log_list = []
 
-    response_text = None
-    while (response_text != ""):
-        params = {
-            "date_range_start" : range_start.strftime('%Y-%m-%dT%H:%M:%SZ'),
-            "date_range_end" : range_end.strftime('%Y-%m-%dT%H:%M:%SZ'),
-            "format" : "ndjson"
-        }
+    time_tracking_auth_token = time.time()
+    
+    # execute first API Call
+    response = make_api_call(url, headers, params, helper, endpoint, stream=False)
+    time.sleep(10)
+    url = response.get("last")
+    helper.log_debug(f"[>] get_bugfender_log_data() - Querying latest page: {url}")
 
-        auth_token = get_bugfender_auth_token(helper.get_arg("global_account"), helper)
-        headers = {"Authorization": f"Bearer {auth_token}"}
-        response = make_api_call(url=url, headers=headers, params=params, helper=helper, endpoint=endpoint, stream=True)
-        helper.log_debug("[>] returning to get_bugfender_log_data() after make_api_call() has been called.")
-        response_text = response.text
-        
-        helper.log_debug("[>] get_bugfender_log_data() BEFORE ndjson to json conversion.")
-        if (response_text == ""):
+    # get to last event, and from there iterate over all past events
+    # data = make_api_call(url, headers=headers, params=None, helper=helper, endpoint=endpoint, stream=False)
+    # time.sleep(5)
+    # url = data.get("previous")
+    # log_list.append(data)
+
+    while (response is not None):
+        # time_tracking_api_calls, api_call_count = wait_if_api_limit_exceeded(time_tracking_api_calls, api_call_count, helper)
+        headers, time_tracking_auth_token = update_header_with_new_auth_token(time_tracking_auth_token, headers, helper)
+        time.sleep(10)
+        response = make_api_call(url, headers, params=None, helper=helper, endpoint=endpoint, stream=False)
+        helper.log_debug(f"[>] get_bugfender_log_data() - got data: {response}")
+
+        data = response.get("data")
+        log_list.append(data)
+
+        url = response.get("previous")
+
+        if (url is None):
             break
-        # data = response.json(cls=ndjson.Decoder)
-        data = ndjson_to_json(response_text, helper)
-        helper.log_debug("[>] get_bugfender_log_data() AFTER ndjson to json conversion.")
-        helper.log_debug(f"Received {len(data)} log events.")
-        log_list += data
-        range_end = (range_start - timedelta(seconds=1)) # one second gap
-        range_start = (range_end - timedelta(days=DAYS_INTERVAL))
 
+    helper.log_debug(f"[>] get_bugfender_log_data() - log list: {log_list}")
     return log_list
+
 
 def get_bugfender_issues_data(url, headers, params, helper):
     helper.log_debug("[>] get_bugfender_issues_data()")
@@ -257,7 +291,7 @@ def get_bugfender_devices_data(url, headers, params, helper):
     # The /devices endpoint works with pagination, therefore multiple API calls are performed.
     # If the overall process is taking longer than one hour, the access token expires. Therefore,
     # we are tracking the time. 
-    query_start_time = time.time()
+    time_tracking_auth_token = time.time()
 
     next_cursor = "start" # intial value to enter while loop below
 
@@ -265,16 +299,11 @@ def get_bugfender_devices_data(url, headers, params, helper):
         if (next_cursor != "start"):
             params["next_cursor"] = next_cursor
 
-        # when 45 minutes (2700 seconds) are passed, get new access token
-        # and reset the timer
-        if (time.time() - query_start_time > 2700):
-            helper.log_debug("[>] get_bugfender_devices_data() - 45 Minutes have passed, acquiring new access token.")
-            headers = update_header_with_new_auth_token(helper)
-            query_start_time = time.time()
+        headers, time_tracking_auth_token = update_header_with_new_auth_token(time_tracking_auth_token, headers, helper)
         
         # Sleeping for 2 seconds to prevent the following error from occuring:
         # "requests.exceptions.HTTPError: 429 Client Error: Too Many Requests for url: https://dashboard.bugfender.com/api/app/30525/devices[...]"
-        time.sleep(2)
+        time.sleep(10)
 
         response = make_api_call(url, headers, params, helper, "/devices", stream=False)
         response = response.json()
@@ -316,14 +345,10 @@ def get_bugfender_endpoint_data(auth_token, endpoint, helper):
     # check if we have any most recent timestamp stored
     last_timestamp = get_latest_timestamp(helper)
 
-    '''
-    if (last_timestamp is None and endpoint == "/logs/paginated"):
-        return get_past_log_data(url, headers, params, helper, endpoint)
-    elif (last_timestamp and endpoint == "/logs/paginated"):
-        params["date_range_start"] = datetime.strptime(last_timestamp, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=pytz.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-        params["date_range_end"] = None
-    '''
-
+    if (endpoint == "/logs/paginated"):
+        params["date_range_start"] = last_timestamp
+        return get_bugfender_log_data(url, headers, params, helper, endpoint)
+    
     if (last_timestamp is None and endpoint == "/issues"):
         return get_past_bugfender_issues_data(url, headers, helper)
     elif (last_timestamp and endpoint == "/issues"):
@@ -336,7 +361,8 @@ def get_bugfender_endpoint_data(auth_token, endpoint, helper):
     if (endpoint == "/issues"):
         return get_bugfender_issues_data(url, headers, params, helper)
     elif (endpoint == "/devices"):
-        params["date_range_start"] = convert_latest_timestamp_to_string(last_timestamp, helper)
+        # params["date_range_start"] = "convert_latest_timestamp_to_string(last_timestamp, helper)"
+        params["date_range_start"] = "2023-05-01T00:00:00Z" ## DEBUG
         return get_bugfender_devices_data(url, headers, params, helper)
 
     # perform API call

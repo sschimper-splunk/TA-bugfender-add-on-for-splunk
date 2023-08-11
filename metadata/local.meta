@@ -1,0 +1,23 @@
+[ta_bugfender_add_on_for_splunk_settings/logging]
+version = 9.1.0
+modtime = 1691753258.268369000
+
+[passwords/credential%3A__REST_CREDENTIAL__%23TA-bugfender-add-on-for-splunk%23configs%2Fconf-ta_bugfender_add_on_for_splunk_account%3Aem%60%60splunk_cred_sep%60%601%3A]
+owner = admin
+version = 9.1.0
+modtime = 1691753315.878509000
+
+[passwords/credential%3A__REST_CREDENTIAL__%23TA-bugfender-add-on-for-splunk%23configs%2Fconf-ta_bugfender_add_on_for_splunk_account%3Aem%60%60splunk_cred_sep%60%602%3A]
+owner = admin
+version = 9.1.0
+modtime = 1691753315.891966000
+
+[ta_bugfender_add_on_for_splunk_account/em]
+owner = admin
+version = 9.1.0
+modtime = 1691753315.906280000
+
+[indexes/bugfender]
+owner = admin
+version = 9.1.0
+modtime = 1691754493.750254000
